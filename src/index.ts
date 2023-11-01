@@ -1,11 +1,10 @@
-import { MyReadFactory } from "./modules/read/factory/readFactory"
+import { App } from "./app"
 
-;(async () => {
+const app = new App({ 
+    config: { 
+      url: 'https://apontamentos.lab2dev.com/', 
+      titleXPath: '/html/head/title'    
+    }, 
+  })
 
-    const URL_LAB_APONTAMENTOS = 'https://apontamentos.lab2dev.com/'
-
-    const myReadFactory = await MyReadFactory.createInstance()
-    const result = await myReadFactory.readPage({ url: URL_LAB_APONTAMENTOS })
-    console.log(result)
-
-})()
+app.run()
