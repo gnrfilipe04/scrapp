@@ -1,4 +1,4 @@
-import puppeteer, { Browser, GoToOptions, Page, Viewport, } from "puppeteer"
+import puppeteer, { Browser, ElementHandle, GoToOptions, Page, Viewport, } from "puppeteer"
 import { AppError } from "./appError"
 
 export type NavigateToParams = {
@@ -8,12 +8,20 @@ export type NavigateToParams = {
 }
 
 export interface MyBrowserDTO {
-    readPage: (params: NavigateToParams) => Promise<string>
+    readPage: () => Promise<string>
     launch: () => Promise<Browser>
-    navigateTo: (params: NavigateToParams) => Promise<Page>
+    setPage: (page: Page) => Promise<void>
+    searchByXPath: (xpath: string) => Promise<string | null>
+    navigateTo: (params: NavigateToParams) => Promise<MyBrowserDTO>
+    page: Page
 }
 
 export class MyBrowser implements MyBrowserDTO {
+    page: Page
+
+    constructor(){
+        this.page = {} as Page
+    }
 
     async launch(){
         return await puppeteer.launch({ headless: "new" })
@@ -22,24 +30,42 @@ export class MyBrowser implements MyBrowserDTO {
     async navigateTo({ url, options, viewportConfig }: NavigateToParams){
         try{
             const browser = await this.launch()
-            const page = await browser.newPage();
-            await page.goto(url, options);
-            await page.setViewport(viewportConfig || { width: 1080, height: 1024 });
-            return page
+            this.page = await browser.newPage();
+            await this.page.goto(url, options);
+            await this.page.setViewport(viewportConfig || { width: 1080, height: 1024 });
+            return this
 
         }catch(e){
-            throw new AppError(`Error on navigate to page: ${e}`,)
+            console.log(`Error on navigate to page: ${e}`,)
+            return this
         }
     }
 
-    async readPage({ url, options, viewportConfig }: NavigateToParams){
+    async readPage(){
         try{
-            const page = await this.navigateTo({ url, options, viewportConfig })
-            const result = await page.content()
+            const result = await this.page.content()
             return result
             
         }catch(e){
-            throw new AppError(`Error on read this page: ${e}`,)
+            console.log(`Error on read this page: ${e}`,)
+            return ''
         }
     }
+
+    async searchByXPath(xpath: string){
+        try{
+            const element = await this.page.$x(xpath)
+            const textContent = await this.page.evaluate(el => el.textContent, element[0])
+            return textContent
+            
+        }catch(e){
+            console.log(`Error on search by xpath: ${e}`,)
+            return ''
+        }
+    }
+
+    async setPage(page: Page){
+        this.page = page
+    }
+
 }
