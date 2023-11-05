@@ -1,5 +1,6 @@
 import { ConfigDTO } from "../config"
 import { FileFactory } from "../modules/file/factory/fileFactory"
+
 import { MyReadPageFactory } from "../modules/read/factory/readPageFactory"
 
 export interface AppDTO {
@@ -27,7 +28,7 @@ export class App implements AppDTO {
 		const fileFactory = await FileFactory.createInstance({ filename, })
 
 		fileFactory.write(element)
-
+    
 		console.log(element)
 	}
 }
