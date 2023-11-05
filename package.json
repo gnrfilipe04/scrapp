@@ -23,5 +23,8 @@
   },
   "dependencies": {
     "puppeteer": "^21.4.1"
+  },
+  "nodemonConfig": {
+    "ignore": ["src/data/*.json"]
   }
 }
