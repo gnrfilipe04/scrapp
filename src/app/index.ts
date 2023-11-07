@@ -17,7 +17,7 @@ export class App implements AppDTO {
 
 	async run(){
 		
-		await this.titlePageToFile()
+		await this.getTotalHoursWorked()
 		
 	}
 
@@ -27,6 +27,7 @@ export class App implements AppDTO {
 		const contentOrNotFound = content || 'Content not found!'
 
 		this.setTitleInFile({ content: contentOrNotFound })
+		
 	}
 
 	async getTitlePage(){
@@ -35,7 +36,7 @@ export class App implements AppDTO {
 		const myReadPageFactory = await MyReadPageFactory.createInstance({ url, })
 		
 		const content = await myReadPageFactory.searchByXPath(titleXPath)
-
+		
 		return content
 	}
 
@@ -45,5 +46,14 @@ export class App implements AppDTO {
 		const fileFactory = await FileFactory.createInstance({ filename, })
 
 		fileFactory.write(content)
+	}
+
+	async getTotalHoursWorked(){
+		const { url, } = this.config
+		const MONTH_SELECTOR = 'swiper-slide swiper-slide-next'
+		const HOURS_SELECTOR = '/html/body/div[2]/div[2]/div/div[2]/div[2]/div[1]/strong[1]/span'
+		const myReadPageFactory = await MyReadPageFactory.createInstance({ url, }) 
+
+		myReadPageFactory.getTotalHoursWorked({ hoursSelector: HOURS_SELECTOR, monthSelector: MONTH_SELECTOR })
 	}
 }

@@ -24,4 +24,21 @@ export class MyReadPageService implements MyReadPageServiceDTO {
         const result = await this.repositoryInstance.searchByXPath(xpath)
         return result
     }
+
+    async elementBySelector(selector: string){
+        const element = await this.repositoryInstance.elementBySelector(selector)
+        return element
+    }
+
+    async onClick(element: MyBrowserDTO['element']){
+        return await this.repositoryInstance.onClick(element)
+    }
+
+    async getTotalHoursWorked({monthSelector, hoursSelector}: { monthSelector: string, hoursSelector: string }){
+        const month = await this.elementBySelector(monthSelector)
+        await this.onClick(month)
+
+        const hours = await this.searchByXPath(hoursSelector)
+        console.log({ hours })
+    }
 }

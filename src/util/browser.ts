@@ -1,5 +1,4 @@
 import puppeteer, { Browser, ElementHandle, GoToOptions, Page, Viewport, } from "puppeteer"
-import { AppError } from "./appError"
 
 export type NavigateToParams = {
     url: string,
@@ -10,14 +9,17 @@ export type NavigateToParams = {
 export interface MyBrowserDTO {
     readPage: () => Promise<string>
     launch: () => Promise<Browser>
-    setPage: (page: Page) => Promise<void>
+    elementBySelector: (selector: string) => Promise<MyBrowserDTO['element']>
+    onClick: (element: MyBrowserDTO['element']) => Promise<void>
     searchByXPath: (xpath: string) => Promise<string | null>
     navigateTo: (params: NavigateToParams) => Promise<MyBrowserDTO>
     page: Page
+    element: ElementHandle<Element> | null
 }
 
 export class MyBrowser implements MyBrowserDTO {
     page: Page
+    element: ElementHandle<Element> | null = null
 
     constructor(){
         this.page = {} as Page
@@ -36,8 +38,7 @@ export class MyBrowser implements MyBrowserDTO {
             return this
 
         }catch(e){
-            console.log(`Error on navigate to page: ${e}`,)
-            return this
+            throw new Error(`Error on navigate to page: ${e}`,)
         }
     }
 
@@ -47,8 +48,7 @@ export class MyBrowser implements MyBrowserDTO {
             return result
             
         }catch(e){
-            console.log(`Error on read this page: ${e}`,)
-            return ''
+            throw new Error(`Error on read this page:: ${e}`,)
         }
     }
 
@@ -59,13 +59,28 @@ export class MyBrowser implements MyBrowserDTO {
             return textContent
             
         }catch(e){
-            console.log(`Error on search by xpath: ${e}`,)
-            return ''
+            throw new Error(`Error on search by xpath: ${e}`,)
         }
     }
 
-    async setPage(page: Page){
-        this.page = page
+    async elementBySelector(selector: string){
+        try{
+            const element = await this.page.waitForSelector(selector) // Selector of production --> 'div > .swiper-slide swiper-slide-next'
+            return element
+            
+        }catch(e){
+            throw new Error(`Error on search by selector: ${e}`,)
+        }
+    }
+
+
+    async onClick(element: MyBrowserDTO['element']){
+        try{
+            await element?.click()
+            
+        }catch(e){
+            throw new Error(`Error on click: ${e}`,)
+        }
     }
 
 }
