@@ -22,11 +22,11 @@ export class App implements AppDTO {
 	}
 
 	async titlePageToFile(){
-		const element = await this.getTitlePage()
+		const content = await this.getTitlePage()
 
-		const elementOrNotFound = element || 'Element not found!'
+		const contentOrNotFound = content || 'Content not found!'
 
-		this.setTitleInFile({ element: elementOrNotFound })
+		this.setTitleInFile({ content: contentOrNotFound })
 	}
 
 	async getTitlePage(){
@@ -34,16 +34,16 @@ export class App implements AppDTO {
 
 		const myReadPageFactory = await MyReadPageFactory.createInstance({ url, })
 		
-		const element = await myReadPageFactory.searchByXPath(titleXPath)
+		const content = await myReadPageFactory.searchByXPath(titleXPath)
 
-		return element
+		return content
 	}
 
-	async setTitleInFile({ element, }: { element: string}){
+	async setTitleInFile({ content, }: { content: string}){
 		const { filename, } = this.config
 
 		const fileFactory = await FileFactory.createInstance({ filename, })
 
-		fileFactory.write(element)
+		fileFactory.write(content)
 	}
 }
